@@ -1,12 +1,15 @@
+#!/usr/bin/env python
 import requests
 from bs4 import BeautifulSoup
 import string
 import time
-words = set(open('words.txt').read().lower().translate(str.maketrans('', '', string.punctuation)).replace('“','').replace('”','').replace('’','').replace('‘', '').split())
+import os
+path = os.path.dirname(os.path.realpath(__file__))
+words = set(open(path + '/words.txt').read().lower().translate(str.maketrans('', '', string.punctuation)).replace('“','').replace('”','').replace('’','').replace('‘', '').split())
 used_words = []
 for word in words:
     try:
-        new_words = set(open('new_words.txt').read().split())
+        new_words = set(open(path + '/new_words.txt').read().split())
     except FileNotFoundError:
         new_words = []
 
@@ -21,7 +24,7 @@ for word in words:
             level = soup.ol.li.span.span.get('class')[0]
             if level == 'ox5ksym_c1':
                 print(word, level)
-                open('new_words.txt', 'a').write(word + '\n')
+                open(path + '/new_words.txt', 'a').write(word + '\n')
             else: 
                 used_words.append(word)
         except AttributeError:

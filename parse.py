@@ -1,11 +1,17 @@
+#!/usr/bin/env python
+import os
 import requests
 import json
 import pyexcel
+import configparser
 
-app_id = ''
-app_key = ''
-sheet_name = 'export.xls'
-words = set(open('new_words.txt').read().lower().split())
+path = os.path.dirname(os.path.realpath(__file__))
+config = configparser.ConfigParser()
+config.read(path + "/api.txt")
+app_id = config.get("api", "app_id")
+app_key = config.get("api", "app_key")
+sheet_name = path + '/export.xls'
+words = set(open(path + '/new_words.txt').read().lower().split())
 try:
     sheet = pyexcel.get_sheet(file_name=sheet_name)
 except FileNotFoundError:
@@ -52,7 +58,6 @@ for word_id in words:
     row = [word_id, spelling(), translation(), meaning(), sentence()]
     sheet.row += row
     sheet.save_as(sheet_name)
-    print(row)
-  
+    print(row) 
 
 
