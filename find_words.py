@@ -1,12 +1,22 @@
 #!/usr/bin/env python
 import requests
 from bs4 import BeautifulSoup
-import string
-import time
-import os
-path = os.path.dirname(os.path.realpath(__file__))
-words = set(open(path + '/words.txt').read().lower().translate(str.maketrans('', '', string.punctuation)).replace('“','').replace('”','').replace('’','').replace('‘', '').split())
-used_words = []
+from fake_user_agent import user_agent
+from string import punctuation
+from os import path
+
+path = path.dirname(path.realpath(__file__))
+url = 'https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000'
+request = requests.session().get(url, headers={'User-Agent': user_agent()})
+words = set(open(path + '/words.txt').read().lower().translate(str.maketrans('', '', punctuation)).replace('“','').replace('”','').replace('’','').replace('‘', '').split())
+wordlist = []
+
+soup = BeautifulSoup(request.text, 'html.parser')
+records = soup.find(id="wordlistsContentPanel").find_all('li')
+for record in records:
+    if record.get('data-ox5000') == 'c1':
+        wordlist.append(record.get('data-hw'))
+
 for word in words:
     try:
         new_words = set(open(path + '/new_words.txt').read().split())
@@ -16,17 +26,6 @@ for word in words:
     if word in new_words:
         continue
     else:
-        url = 'https://www.oxfordlearnersdictionaries.com/definition/english/' + word
-        r = requests.get(url, allow_redirects=True,headers={"User-Agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"})
-
-        soup = BeautifulSoup(r.text, 'html.parser')
-        try:
-            level = soup.ol.li.span.span.get('class')[0]
-            if level == 'ox5ksym_c1':
-                print(word, level)
-                open(path + '/new_words.txt', 'a').write(word + '\n')
-            else: 
-                used_words.append(word)
-        except AttributeError:
-            print(f'no such word "{word}"')
-            used_words.append(word)
+        if word in wordlist:
+            print(f'найдено слово \'{word}\'')
+            open(path + '/new_words.txt', 'a').write(word + '\n')
