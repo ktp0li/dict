@@ -2,13 +2,14 @@
 import requests
 from bs4 import BeautifulSoup
 from fake_user_agent import user_agent
-from string import punctuation
 from os import path
+from re import sub
 
 path = path.dirname(path.realpath(__file__))
 url = 'https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000'
 request = requests.session().get(url, headers={'User-Agent': user_agent()})
-words = set(open(path + '/words.txt').read().lower().translate(str.maketrans('', '', punctuation)).replace('“','').replace('”','').replace('’','').replace('‘', '').split())
+words = set(sub('[“”’‘0-9,.:;–()!?-]', '', open(path + '/words.txt')
+            .read().lower()).split())
 wordlist = []
 
 soup = BeautifulSoup(request.text, 'html.parser')
