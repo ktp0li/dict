@@ -111,4 +111,17 @@ def find():
                 open(path + '/new_words.txt', 'a').write(word + '\n')
 
 
-find()
+try:
+    wordcount = len(open(path + '/new_words.txt').read().split())
+except FileNotFoundError:
+    wordcount = 0
+
+print(f'Найдено {wordcount} слов.')
+if wordcount != 0:
+    print('Создание таблицы...')
+    parse()
+else:
+    print('Поиск С1 слов в книге...')
+    find()
+    print('Советую открыть файл new_words.txt, просмотреть \
+его содержимое, удалить неподходящие слова и вписать нужное')
