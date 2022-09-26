@@ -1,0 +1,6 @@
+requests
+pyexcel
+pyexcel-xls
+configparser
+fake-user-agent
+beautifulsoup4
